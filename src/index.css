@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital@0;1&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Mulish', sans-serif;
+  background: linear-gradient(#f4f0f3, #eaf3f7);
+  min-height: 100vh;
+}
+
+iframe { 
+  display: none;
+}

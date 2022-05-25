@@ -1,0 +1,38 @@
+.copy {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 15px;
+}
+
+.primary {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.secondary {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copy:hover {
+	white-space: unset;
+}
+.copy:hover .primary,
+.copy:hover .secondary {
+  white-space: unset;
+  overflow: unset;
+  text-overflow: unset;
+}
+
+.regular {
+  font-weight: 400;
+}
+
+.heavy {
+  font-weight: 700;
+}

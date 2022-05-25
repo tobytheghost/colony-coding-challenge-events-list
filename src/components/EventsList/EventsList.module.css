@@ -1,0 +1,7 @@
+.events-list {
+  box-shadow: 0 0 0 rgba(62, 118, 244, 0.14);
+  width: 730px;
+  max-width: 100%;
+  margin: 40px auto;
+  padding: 0 15px;
+}
