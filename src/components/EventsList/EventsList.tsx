@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import initColonyClient, { ParsedEvent } from '../../colonyClient'
+import getColonyLogs from '../../colony/getLogs'
+import { ParsedEvent } from '../../colony/types'
 import ListItem from '../ListItem/ListItem'
 import styles from './EventsList.module.css'
 
@@ -7,25 +8,25 @@ const EventsList = () => {
   const [events, setEvents] = useState<ParsedEvent[]>([])
 
   useEffect(() => {
-    let runCleanup = false
+    let isCleanup = false
 
     const getEventLogs = async () => {
-      const { getColonyLogs, parseColonyLog } = await initColonyClient()
-      const { eventLogs } = await getColonyLogs()
+      const { eventLogs, parseColonyLog } = await getColonyLogs()
       eventLogs.forEach((event, i) => {
         // Prevent 429 errors
         setTimeout(async () => {
-          if (runCleanup) return
+          if (isCleanup) return
           const parsedEvent = await parseColonyLog({ event })
+          console.log(parsedEvent)
           setEvents(events => [...events, parsedEvent])
-        }, i * 50)
+        }, i * 100)
       })
     }
     setEvents([])
     getEventLogs()
 
     return () => {
-      runCleanup = true
+      isCleanup = true
     }
   }, [])
 
@@ -36,8 +37,9 @@ const EventsList = () => {
           return (b.logTime || 0) - (a.logTime || 0)
         })
         .map(event => {
-          const { name, transactionHash } = event
-          return <ListItem key={`${transactionHash}_${name}`} {...event} />
+          const { blockNumber, transactionIndex, logIndex, name } = event
+          const eventKey = `${blockNumber}_${transactionIndex}_${logIndex}_${name}`
+          return <ListItem key={eventKey} {...event} />
         })}
     </div>
   )

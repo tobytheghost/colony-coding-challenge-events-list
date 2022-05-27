@@ -1,4 +1,4 @@
-import { ParsedEvent } from '../../colonyClient'
+import { ParsedEvent } from '../../colony/types'
 import Avatar from '../Avatar/Avatar'
 import Copy from '../Copy/Copy'
 import styles from './ListItem.module.css'

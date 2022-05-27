@@ -2,13 +2,14 @@ import Blockies from 'react-blockies'
 import styles from './Avatar.module.css'
 
 interface AvatarProps {
-  userAddress: string
+  userAddress: string | undefined
 }
 
 const Avatar = ({ userAddress }: AvatarProps) => {
+  const seed = userAddress ? userAddress : 'default'
   return (
     <div className={styles['avatar']}>
-      <Blockies seed={userAddress} scale={4}/>
+      <Blockies seed={seed} scale={4}/>
     </div>
   )
 }
