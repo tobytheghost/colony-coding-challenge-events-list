@@ -1,7 +1,8 @@
 import { ColonyClient, getBlockTime, getLogs } from '@colony/colony-js'
 import { EventFilter } from 'ethers'
 import { Log } from 'ethers/providers'
-import getClient, { provider } from './getClient'
+import memoize from '../helpers/memoize'
+import getClient, { MAINNET_NETWORK_ADDRESS, provider } from './getClient'
 import { convertBigNumber } from './helpers'
 
 type ParseColonyLog = { event: Log }
@@ -34,37 +35,46 @@ const getColonyLogs = async () => {
   )
 
   const eventLogs = [
-    ...eventPayoutLogs,
-    ...eventsDomainAddedLogs,
     ...eventsColonyInitialisedLogs,
-    ...eventsColonyRoleSetLogs
-  ]
+    ...eventsColonyRoleSetLogs,
+    ...eventsDomainAddedLogs,
+    ...eventPayoutLogs
+  ].reverse()
+
+  const memoizedGetFundingPot = memoize(colonyClient.getFundingPot)
+  const memoizedGetPayment = memoize(colonyClient.getPayment)
 
   const getUserAddress = async (fundingPotId: string | undefined) => {
     if (!fundingPotId) return
     const convertedPotId = convertBigNumber(fundingPotId)
-    const fundingPot = await colonyClient.getFundingPot(convertedPotId)
+    const fundingPot = await memoizedGetFundingPot(convertedPotId)
     if (!fundingPot) return
-    const payment = await colonyClient.getPayment(fundingPot.associatedTypeId)
+    const payment = await memoizedGetPayment(fundingPot.associatedTypeId)
     if (!payment) return
     return payment.recipient
   }
 
+  const memoizedGetBlockTime = memoize(getBlockTime)
+
   const getLogTime = async (blockHash: string | undefined) => {
     if (!blockHash) return
-    return await getBlockTime(provider, blockHash)
+    return await memoizedGetBlockTime(provider, blockHash)
   }
+
+  const memoizedGetUserAddress = memoize(getUserAddress)
+  const memoizedGetLogTime = memoize(getLogTime)
 
   const parseColonyLog = async ({ event }: ParseColonyLog) => {
     const parsedEvent = colonyClient.interface.parseLog(event)
     const fundingPotId = parsedEvent.values.fundingPotId
-    const userAddress = await getUserAddress(fundingPotId)
-    const logTime = await getLogTime(event.blockHash)
+    const userAddress = parsedEvent.values.user || await memoizedGetUserAddress(fundingPotId)
+    const logTime = await memoizedGetLogTime(event.blockHash)
+    console.log(parsedEvent)
     return {
       ...event,
       ...parsedEvent,
+      userAddress: userAddress ? userAddress : MAINNET_NETWORK_ADDRESS,
       logTime,
-      userAddress
     }
   }
 

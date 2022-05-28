@@ -5,6 +5,10 @@
   display: flex;
   justify-content: left;
   align-items: center;
+  transition: transform 0.2s ease;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .list-item:first-child {
@@ -17,4 +21,22 @@
 
 .list-item:hover {
   outline: 1px solid #f4f0f3;
+  transform: scale(1.05);
+}
+
+.list-item-copy {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 15px;
+}
+
+.list-item:hover .list-item-copy {
+	white-space: unset;
+}
+.list-item:hover .list-item-copy > div,
+.list-item:hover .list-item-copy > div {
+  white-space: unset;
+  overflow: unset;
+  text-overflow: unset;
 }

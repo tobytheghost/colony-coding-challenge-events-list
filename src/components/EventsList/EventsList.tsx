@@ -13,13 +13,12 @@ const EventsList = () => {
     const getEventLogs = async () => {
       const { eventLogs, parseColonyLog } = await getColonyLogs()
       eventLogs.forEach((event, i) => {
-        // Prevent 429 errors
+        // Slow down to prevent 429 errors
         setTimeout(async () => {
           if (isCleanup) return
           const parsedEvent = await parseColonyLog({ event })
-          console.log(parsedEvent)
           setEvents(events => [...events, parsedEvent])
-        }, i * 100)
+        }, i * 50)
       })
     }
     setEvents([])
@@ -27,6 +26,7 @@ const EventsList = () => {
 
     return () => {
       isCleanup = true
+      setEvents([])
     }
   }, [])
 

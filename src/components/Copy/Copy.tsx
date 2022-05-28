@@ -1,3 +1,4 @@
+import { ColonyRole } from '@colony/colony-js';
 import { convertBigNumber, wei } from '../../colony/helpers'
 import TOKENS from '../../colony/tokens'
 import {
@@ -7,9 +8,16 @@ import {
   PayoutClaimedEvent,
   Token
 } from '../../colony/types'
+import getDateString from '../../helpers/getDate'
 import styles from './Copy.module.css'
 
-const Copy = (event: ParsedEvent) => {
+interface CopyProps {
+  event: ParsedEvent
+  className?: string
+}
+
+const Copy = (props: CopyProps) => {
+  const { className, event } = props
   const ListItemContent = () => {
     switch (event.name) {
       case 'DomainAdded': {
@@ -29,7 +37,7 @@ const Copy = (event: ParsedEvent) => {
   }
 
   return (
-    <div className={styles['copy']}>
+    <div className={[className, styles['copy']].join(' ')}>
       <div className={styles['primary']}>
         <ListItemContent />
       </div>
@@ -63,11 +71,10 @@ const PayoutClaimedContent = ({ values, userAddress }: PayoutClaimedEvent) => {
   )
 }
 
-const ColonySetContent = ({
-  role,
-  userAddress,
-  domainId
-}: ColonyRoleSetEvent) => {
+const ColonySetContent = ({ values, userAddress }: ColonyRoleSetEvent) => {
+  const domainId = convertBigNumber(values.domainId)
+  const roleNumber = convertBigNumber(values.role)
+  const role = ColonyRole[roleNumber.toNumber()]
   return (
     <>
       <span className={styles['heavy']}>{`${role}`}</span> role assigned to user{' '}
@@ -79,28 +86,6 @@ const ColonySetContent = ({
 
 const ColonyInitialisedContent = () => {
   return <>Congratulations! It's a beautiful baby colony!</>
-}
-
-const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec'
-]
-
-const getDateString = (event: ParsedEvent) => {
-  const { logTime } = event
-  const date = logTime && new Date(logTime)
-  if (!date) return ''
-  return `${('0' + date.getDate()).slice(-2)} ${MONTHS[date.getMonth()]}`
 }
 
 export default Copy
